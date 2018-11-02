@@ -18,7 +18,7 @@ struct Wengert
   instructions::Vector{Any}
 end
 
-Wengert(; variable = :x) = Wengert(variable, [])
+Wengert(; variable = :y) = Wengert(variable, [])
 
 Base.keys(w::Wengert) = (Variable(w.variable, i) for i = 1:length(w.instructions))
 Base.lastindex(w::Wengert) = Variable(w.variable, length(w.instructions))
@@ -55,7 +55,7 @@ function pushblock!(w::Wengert, x)
   return Variable(w.variable, length(w.instructions))
 end
 
-function Wengert(ex; variable = :x)
+function Wengert(ex; variable = :y)
   w = Wengert(variable = variable)
   push!(w, ex)
   return w
@@ -84,4 +84,26 @@ function Expr(w::Wengert)
   end
   push!(ex.args, rename(bs[lastindex(w)]))
   return unblock(ex)
+end
+
+addm(a, b) = a == 0 ? b : b == 0 ? a : :($a + $b)
+mulm(a, b) = 0 in (a, b) ? 0 : a == 1 ? b : b == 1 ? a : :($a * $b)
+mulm(a, b, c...) = mulm(mulm(a, b), c...)
+
+function derive(w::Wengert, x)
+  ds = Dict()
+  ds[x] = 1
+  d(x) = get(ds, x, 0)
+  for v in keys(w)
+    ex = w[v]
+    Δ = @capture(ex, a_ + b_) ? addm(d(a), d(b)) :
+        @capture(ex, a_ * b_) ? addm(mulm(a, d(b)), mulm(b, d(a))) :
+        @capture(ex, a_^n_Number) ? mulm(d(a),n,:($a^$(n-1))) :
+        @capture(ex, a_ / b_) ? :($(mulm(b, d(a))) - $(mulm(a, d(b))) / $b^2) :
+        @capture(ex, sin(a_)) ? mulm(:(cos($a)), d(a)) :
+        @capture(ex, cos(a_)) ? mulm(:(-sin($a)), d(a)) :
+        error("$ex is not differentiable")
+    ds[v] = push!(w, Δ)
+  end
+  return w
 end

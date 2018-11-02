@@ -20,8 +20,8 @@ for f in ["utils.jl"]
   cp(joinpath(src, f), joinpath(out, f), force = true)
 end
 
-for f in ["intro.jl"]
-  Literate.notebook(joinpath(src, "intro.jl"), out,
+for f in ["intro.jl", "backandforth.jl"]
+  Literate.notebook(joinpath(src, f), out,
                     preprocess = preprocess,
                     credit = false)
 end
