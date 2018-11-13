@@ -1,20 +1,20 @@
-# The Differentiation Handbook
-# ============================
-
+# Differentiation for Hackers
+# ===========================
+#
 # These notebooks are an exploration of various approaches to analytical
 # differentiation. Differentiation is something you learned in school; we start
 # with an expression like $y = 3x^2 + 2x + 1$ and find an expression for the
 # derivative like $\frac{dy}{dx} = 6x + 2$. Once we have such an expression, we
 # can *evaluate* it by plugging in a specific value for $x$ (say 0.5) to find
 # the derivative at that point (in this case $\frac{dy}{dx} = 5$).
-
+#
 # Despite its surface simplicity, this technique lies at the core of all modern
 # machine learning and deep learning, alongside many other parts of statistics,
 # mathematical optimisation and engineering. There has recently been an
 # explosion in automatic differentiation (AD) tools, all with different designs
 # and tradeoffs, and it can be difficult to understand how they relate to each
 # other.
-
+#
 # We aim to fix this by beginning with the "calculus 101" rules that you are
 # familiar with and implementing simple symbolic differentiators over mathematical
 # expressions. Then we show how tweaks to this basic framework generalise from
@@ -24,7 +24,7 @@
 
 # Symbolic Differentiation
 # ------------------------
-
+#
 # To talk about derivatives, we need to talk about *expressions*, which are
 # symbolic forms like $x^2 + 1$ (as opposed to numbers like $5$). Normal Julia
 # programs only work with numbers; we can write down $x^2 + 1$ but this only
@@ -67,7 +67,7 @@ eval(y)
 
 # How might we differentiate an expression like $x^2 + 1$? We can start by
 # looking at the basic rules in differential calculus.
-
+#
 # $$
 # \begin{align}
 # \frac{d}{dx} x &= 1 \\
@@ -78,7 +78,7 @@ eval(y)
 # \frac{d}{dx} u^n &= n u^{n-1} \\
 # \end{align}
 # $$
-
+#
 # Seeing $\frac{d}{dx}(u)$ as a function, these rules look a lot like a
 # recursive algorithm. To differentiate something like `y = a + b`, we
 # differentiate `a` and `b` and combine them together. To differentiate `a` we
@@ -199,12 +199,12 @@ derive(:(x / (1 + x^2) * x), :x)
 # This happens because our rules look like $\frac{d(u*v)}{dx} = u*\frac{dv}{dx}
 # + v*\frac{du}{dx}$. Every multiplication repeats the whole sub-expression and its
 # derivative, making the output exponentially large in the size of its input.
-
+#
 # This seems to be an achilles heel for our little differentiator, since it will
 # make it impractical to run on any realistically-sized program. But wait!
 # Things are not quite as simple as they seem, because this expression is not
 # *actually* as big as it looks.
-
+#
 # Imagine we write down:
 
 y1 = :(1 * 2)
@@ -214,7 +214,7 @@ y2 = :($y1 + $y1 + $y1 + $y1)
 # $1+2$ four times over, just four pointers to $y1$; it is not really a tree but
 # a graph that gets printed as a tree. We can show this by explicitly printing
 # the expression in a way that preserves structure.
-
+#
 # (The definition of `printstructure` is not important to understand, but is
 # here for reference.)
 
@@ -231,8 +231,8 @@ end
 printstructure(y2);
 
 # Note that this is *not* the same as running common subexpression elimination
-# to simplify the tree, which would have an $O(n^2)$ computational cost.
-# If there is real duplication in the expression, it'll show up.
+# to simplify the tree, which would have an $O(n^2)$ computational cost. If
+# there is real duplication in the expression, it'll show up.
 
 :(1*2 + 1*2) |> printstructure;
 
@@ -265,7 +265,7 @@ derive(:(x / (1 + x^2) * x), :x) |> printstructure;
 # differentiate it or not. "Expression swell" has nothing to do with the
 # differentiation algorithm itself, and we need not change it to get better
 # results.
-
+#
 # Conversely, the way we have used `Expr` objects to represent variable bindings
 # is perfectly sound, if a little unusual. This format could happily be used to
 # illustrate all of the concepts in this handbook, and the recursive algorithms
@@ -275,7 +275,7 @@ derive(:(x / (1 + x^2) * x), :x) |> printstructure;
 
 # The Wengert List
 # ----------------
-
+#
 # The output of `printstructure` above is known as a "Wengert List", an explicit
 # list of instructions that's a bit like writing assembly code. Really, Wengert
 # lists are nothing more or less than mathematical expressions written out
@@ -290,7 +290,7 @@ wy = Wengert(y)
 Expr(wy)
 
 # Inside, we can see that it really is just a list of function calls, where
-# $x_n$ refers to the result of the $n^{th}$.
+# $y_n$ refers to the result of the $n^{th}$.
 
 wy.instructions
 
@@ -331,7 +331,7 @@ derive(:(x / (1 + x^2)), :x) |> printstructure
 #-
 derive(Wengert(:(x / (1 + x^2))), :x)
 
-# They are *almost* identical; the only difference is the unused variable `x3`
+# They are *almost* identical; the only difference is the unused variable `y3`
 # in the Wengert version. This happens because our `Expr` format effectively
 # removes dead code for us automatically. We'll see the same thing happen if
 # we convert the Wengert list back into an `Expr`.
@@ -355,3 +355,47 @@ function derive(w::Wengert, x)
 end
 
 derive(Wengert(:(x / (1 + x^2))), :x) |> Expr
+
+# One more thing. The astute reader may notice that our differentiation
+# algorithm begins with $\frac{dx}{dx}=1$ and propagates this forward to the
+# output; in other words it does [forward-mode
+# differentiation](./backandforth.ipynb). We can tweak our code a little to do
+# reverse mode instead.
+
+function derive_r(w::Wengert, x)
+  ds = Dict()
+  d(x) = get(ds, x, 0)
+  d(x, Δ) = ds[x] = haskey(ds, x) ? addm(ds[x],Δ) : Δ
+  d(lastindex(w), 1)
+  for v in reverse(collect(keys(w)))
+    ex = w[v]
+    Δ = d(v)
+    if @capture(ex, a_ + b_)
+      d(a, Δ)
+      d(b, Δ)
+    elseif @capture(ex, a_ * b_)
+      d(a, push!(w, mulm(Δ, b)))
+      d(b, push!(w, mulm(Δ, a)))
+    elseif @capture(ex, a_^n_Number)
+      d(a, mulm(Δ, n, :($a^$(n-1))))
+    elseif @capture(ex, a_ / b_)
+      d(a, push!(w, mulm(Δ, b)))
+      d(b, push!(w, :(-$(mulm(Δ, a))/$b^2)))
+    else
+      error("$ex is not differentiable")
+    end
+  end
+  push!(w, d(x))
+  return w
+end
+
+# There are only two distinct algorithms in this handbook, and this is the
+# second! It's quite similar to forward mode, with the difference that we
+# walk backwards over the list, and each time we see a usage of a variable
+# $y_i$ we accumulate a gradient for that variable.
+
+derive_r(Wengert(:(x / (1 + x^2))), :x) |> Expr
+
+# For now, the output looks pretty similar to that of forward mode; we'll
+# explain why the [distinction makes a difference](./backforth.ipynb) in future
+# notebooks.
