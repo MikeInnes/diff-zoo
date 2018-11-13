@@ -1,4 +1,4 @@
-using MacroTools
+using MacroTools, InteractiveUtils
 
 struct Variable
   name::Symbol
@@ -90,7 +90,7 @@ addm(a, b) = a == 0 ? b : b == 0 ? a : :($a + $b)
 mulm(a, b) = 0 in (a, b) ? 0 : a == 1 ? b : b == 1 ? a : :($a * $b)
 mulm(a, b, c...) = mulm(mulm(a, b), c...)
 
-function derive(w::Wengert, x)
+function derive(w::Wengert, x; out = w)
   ds = Dict()
   ds[x] = 1
   d(x) = get(ds, x, 0)
@@ -102,8 +102,10 @@ function derive(w::Wengert, x)
         @capture(ex, a_ / b_) ? :($(mulm(b, d(a))) - $(mulm(a, d(b))) / $b^2) :
         @capture(ex, sin(a_)) ? mulm(:(cos($a)), d(a)) :
         @capture(ex, cos(a_)) ? mulm(:(-sin($a)), d(a)) :
+        @capture(ex, exp(a_)) ? mulm(v, d(a)) :
+        @capture(ex, log(a_)) ? mulm(:(1/$a), d(a)) :
         error("$ex is not differentiable")
-    ds[v] = push!(w, Δ)
+    ds[v] = push!(out, Δ)
   end
-  return w
+  return out
 end
