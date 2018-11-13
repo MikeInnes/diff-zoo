@@ -1,4 +1,4 @@
-using MacroTools, InteractiveUtils
+using MacroTools, InteractiveUtils, SpecialFunctions
 
 struct Variable
   name::Symbol
@@ -108,4 +108,31 @@ function derive(w::Wengert, x; out = w)
     ds[v] = push!(out, Δ)
   end
   return out
+end
+
+function derive_r(w::Wengert, x)
+  ds = Dict()
+  d(x) = get(ds, x, 0)
+  d(x, Δ) = ds[x] = haskey(ds, x) ? addm(ds[x],Δ) : Δ
+  d(lastindex(w), 1)
+  for v in reverse(collect(keys(w)))
+    ex = w[v]
+    Δ = d(v)
+    if @capture(ex, a_ + b_)
+      d(a, Δ)
+      d(b, Δ)
+    elseif @capture(ex, a_ * b_)
+      d(a, push!(w, mulm(Δ, b)))
+      d(b, push!(w, mulm(Δ, a)))
+    elseif @capture(ex, a_^n_Number)
+      d(a, mulm(Δ, n, :($a^$(n-1))))
+    elseif @capture(ex, a_ / b_)
+      d(a, push!(w, mulm(Δ, b)))
+      d(b, push!(w, :(-$(mulm(Δ, a))/$b^2)))
+    else
+      error("$ex is not differentiable")
+    end
+  end
+  push!(w, d(x))
+  return w
 end
