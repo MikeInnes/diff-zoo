@@ -272,4 +272,6 @@ imag(f(x+ϵ)) / imag(ϵ)
 # by floating point error). The dual number is then a slight variation which
 # makes the limit $\epsilon \rightarrow 0$ exact, rather than approximate.
 # Forward mode AD can be described as "just" a clever implementation of
-# numerical differentiation.
+# numerical differentiation. Both numerical and forward derivatives propagate
+# a perturbation $\epsilon$ using the same basic rules, and they have the
+# same algorithmic properties.

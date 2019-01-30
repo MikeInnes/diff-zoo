@@ -262,8 +262,9 @@ derive(:(x / (1 + x^2) * x), :x) |> printstructure;
 
 # Calculator notation – expressions without variable bindings – is a terrible
 # format for anything, and will tend to blow up in size whether you
-# differentiate it or not. "Expression swell" has nothing to do with the
-# differentiation algorithm itself, and we need not change it to get better
+# differentiate it or not. Symbolic differentiation is commonly criticised for
+# its susceptability to "expression swell", but in fact has nothing to do with
+# the differentiation algorithm itself, and we need not change it to get better
 # results.
 #
 # Conversely, the way we have used `Expr` objects to represent variable bindings
@@ -397,5 +398,5 @@ end
 derive_r(Wengert(:(x / (1 + x^2))), :x) |> Expr
 
 # For now, the output looks pretty similar to that of forward mode; we'll
-# explain why the [distinction makes a difference](./backforth.ipynb) in future
+# explain why the [distinction makes a difference](./backandforth.ipynb) in future
 # notebooks.

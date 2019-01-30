@@ -157,7 +157,7 @@ y = f(x)
 # J_{ij} = \frac{dy_i}{dx_j}
 # $$
 #
-# This matrix is called the *Jacobian*, and in general it's what we mean by
+# This $2\times2$ matrix is called the *Jacobian*, and in general it's what we mean by
 # $\frac{dy}{dx}$. (The Jacobian for a scalar function like $y = \sin(x)$ only
 # has one element, so it's consistent with our current idea of the derivative
 # $\frac{dy}{dx}$.) The key point here is that the Jacobian is a potentially
