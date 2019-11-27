@@ -196,9 +196,10 @@ derive(:(x / (1 + x^2)), :x)
 
 derive(:(x / (1 + x^2) * x), :x)
 
-# This happens because our rules look like $\frac{d(u*v)}{dx} = u*\frac{dv}{dx}
-# + v*\frac{du}{dx}$. Every multiplication repeats the whole sub-expression and its
-# derivative, making the output exponentially large in the size of its input.
+# This happens because our rules look like,
+# $\frac{d(u*v)}{dx} = u*\frac{dv}{dx} + v*\frac{du}{dx}$.
+# Every multiplication repeats the whole sub-expression and its derivative,
+# making the output exponentially large in the size of its input.
 #
 # This seems to be an achilles heel for our little differentiator, since it will
 # make it impractical to run on any realistically-sized program. But wait!
