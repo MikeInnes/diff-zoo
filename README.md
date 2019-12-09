@@ -1,5 +1,7 @@
 # Differentiation for Hackers
 
+[![Build Status](https://travis-ci.org/MikeInnes/diff-zoo.svg?branch=master)](https://travis-ci.org/MikeInnes/diff-zoo)
+
 The goal of this handbook is to demystify *algorithmic differentiation*, the
 tool that underlies modern machine learning. It begins with a calculus-101 style
 understanding and gradually extends this to build toy implementations of systems
