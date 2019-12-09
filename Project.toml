@@ -1,4 +1,5 @@
 name = "diff-zoo"
+uuid = "0e990500-197d-40a9-9393-fcd66887cc96"
 authors = ["Mike J Innes <mike.j.innes@gmail.com>"]
 
 [deps]
