@@ -3,6 +3,7 @@ uuid = "0e990500-197d-40a9-9393-fcd66887cc96"
 authors = ["Mike J Innes <mike.j.innes@gmail.com>"]
 
 [deps]
+InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
