@@ -10,6 +10,8 @@ notifications:
   email: false
 git:
   depth: 99999999
+before_script:
+  - touch src/diff-zoo.jl # so that we can use the standard script
 jobs:
   allow_failures:
   - julia: nightly
