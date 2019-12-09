@@ -1,0 +1,15 @@
+## Documentation: http://docs.travis-ci.com/user/languages/julia/
+language: julia
+dist: bionic
+os:
+  - linux
+julia:
+  - 1.3
+  - nightly
+notifications:
+  email: false
+git:
+  depth: 99999999
+jobs:
+  allow_failures:
+  - julia: nightly
