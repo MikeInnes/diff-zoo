@@ -146,7 +146,7 @@ y = f(x)
 # \begin{align}
 # \frac{dy_1}{dx_1} &= \frac{d}{dx_1} x_1 \times x_2 = x_2 \\
 # \frac{dy_1}{dx_2} &= \frac{d}{dx_2} x_1 \times x_2 = x_1 \\
-# \frac{dy_2}{dx_1} &= \frac{d}{dx_1} \cos(x_1) = \sin(x_1) \\
+# \frac{dy_2}{dx_1} &= \frac{d}{dx_1} \cos(x_1) = -\sin(x_1) \\
 # \frac{dy_2}{dx_2} &= \frac{d}{dx_2} \cos(x_1) = 0 \\
 # \end{align}
 # $$
