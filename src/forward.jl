@@ -98,7 +98,7 @@ import Base: +, -, *, /
 a::Dual + b::Dual = Dual(a.x + b.x, a.ϵ + b.ϵ)
 a::Dual - b::Dual = Dual(a.x - b.x, a.ϵ - b.ϵ)
 a::Dual * b::Dual = Dual(a.x * b.x, b.x * a.ϵ + a.x * b.ϵ)
-a::Dual / b::Dual = Dual(a.x * b.x, b.x * a.ϵ - a.x * b.ϵ)
+a::Dual / b::Dual = Dual(a.x / b.x, (b.x * a.ϵ - a.x * b.ϵ) / b.x^2)
 
 Base.sin(d::Dual) = Dual(sin(d.x), d.ϵ * cos(d.x))
 Base.cos(d::Dual) = Dual(cos(d.x), - d.ϵ * sin(d.x))
