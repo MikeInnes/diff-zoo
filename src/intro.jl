@@ -212,7 +212,7 @@ y1 = :(1 * 2)
 y2 = :($y1 + $y1 + $y1 + $y1)
 
 # This looks like a large expression, but in actual fact it does not contain
-# $1+2$ four times over, just four pointers to $y1$; it is not really a tree but
+# $1*2$ four times over, just four pointers to $y1$; it is not really a tree but
 # a graph that gets printed as a tree. We can show this by explicitly printing
 # the expression in a way that preserves structure.
 #
