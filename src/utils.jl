@@ -99,7 +99,7 @@ function derive(w::Wengert, x; out = w)
     Δ = @capture(ex, a_ + b_) ? addm(d(a), d(b)) :
         @capture(ex, a_ * b_) ? addm(mulm(a, d(b)), mulm(b, d(a))) :
         @capture(ex, a_^n_Number) ? mulm(d(a),n,:($a^$(n-1))) :
-        @capture(ex, a_ / b_) ? :($(mulm(b, d(a))) - $(mulm(a, d(b))) / $b^2) :
+        @capture(ex, a_ / b_) ? :(($(mulm(b, d(a))) - $(mulm(a, d(b)))) / $b^2) :
         @capture(ex, sin(a_)) ? mulm(:(cos($a)), d(a)) :
         @capture(ex, cos(a_)) ? mulm(:(-sin($a)), d(a)) :
         @capture(ex, exp(a_)) ? mulm(v, d(a)) :
@@ -127,7 +127,7 @@ function derive_r(w::Wengert, x)
     elseif @capture(ex, a_^n_Number)
       d(a, mulm(Δ, n, :($a^$(n-1))))
     elseif @capture(ex, a_ / b_)
-      d(a, push!(w, mulm(Δ, b)))
+      d(a, push!(w, :($(mulm(Δ, b))/$b^2)))
       d(b, push!(w, :(-$(mulm(Δ, a))/$b^2)))
     else
       error("$ex is not differentiable")
