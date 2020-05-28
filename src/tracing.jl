@@ -225,8 +225,8 @@ function derive(w::Tape, xs...)
     elseif @capture(ex, a_^n_Number)
       d(a, Δ * n * val(a) ^ (n-1))
     elseif @capture(ex, a_ / b_)
-      d(a, Δ * val(b))
-      d(b, -Δ*val(a)/val(b)^2)
+      d(a, Δ * val(b)/val(b)^2)
+      d(b, -Δ * val(a)/val(b)^2)
     else
       error("$ex is not differentiable")
     end
