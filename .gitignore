@@ -1,1 +1,4 @@
 notebooks
+!docs/src/notebooks
+docs/build
+docs/**/*.md

@@ -1,6 +1,13 @@
+!!! note
+    This is a clone of [the "Differentiation for Hackers" handbook](https://github.com/MikeInnes/diff-zoo), written by Mike J. Innes.
+    All the purpose of this clone is to render the notebooks with [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl) and host them on GitHub Pages.
+    The notebooks rendered by Documenter.jl are available [here](https://aviatesk.github.io/diff-zoo/dev/).
+    Except that, all the contents should be identical, and all the credit goes to him.
+
 # Differentiation for Hackers
 
 [![Build Status](https://travis-ci.org/MikeInnes/diff-zoo.svg?branch=master)](https://travis-ci.org/MikeInnes/diff-zoo)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://aviatesk.github.io/diff-zoo/dev/)
 
 The goal of this handbook is to demystify *algorithmic differentiation*, the
 tool that underlies modern machine learning. It begins with a calculus-101 style

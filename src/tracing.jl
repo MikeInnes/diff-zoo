@@ -290,9 +290,9 @@ gradient(x -> gradient(mysin, x)[1], 0.5)
 # ### Footnotes
 
 # $^1$ Systems like TensorFlow can also just provide ways to inject control flow
-# into the graph. This brings us closer to a [source-to-source
-# approach](./reverse.ipynb) where Python is used to build an expression in
-# TensorFlows internal graph language.
+#      into the graph. This brings us closer to a [source-to-source
+#      approach](./reverse.ipynb) where Python is used to build an expression in
+#      TensorFlows internal graph language.
 
 # Fun fact: PyTorch and Flux's tapes are actually closer to the `Expr` format
 # that we originally used, in which "tracked" tensors just have pointers to
