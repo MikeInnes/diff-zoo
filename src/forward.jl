@@ -224,6 +224,7 @@ D(x -> x*D(y -> x*y, 1), 4) # == 8
 # We can see how our definition of $\epsilon$ works out by applying it to
 # $f(x+\epsilon)$; let's say that $f(x) = sin(x^2)$.
 #
+# $$
 # \begin{align}
 # f(x + \epsilon) &= \sin((x + \epsilon)^2) \\
 #                 &= \sin(x^2 + 2x\epsilon + \epsilon^2) \\
@@ -231,6 +232,7 @@ D(x -> x*D(y -> x*y, 1), 4) # == 8
 #                 &= \sin(x^2)\cos(2x\epsilon) + \cos(x^2)\sin(2x\epsilon) \\
 #                 &= \sin(x^2) + 2x\cos(x^2)\epsilon \\
 # \end{align}
+# $$
 #
 # A few things have happened here. Firstly, we directly expand $(x+\epsilon)^2$
 # and remove the $\epsilon^2$ term. We expand $sin(a+b)$ and then apply a *small
@@ -239,10 +241,12 @@ D(x -> x*D(y -> x*y, 1), 4) # == 8
 # our original definition of $\epsilon$ if we look at the Taylor expansion of
 # both functions). Finally we can plug this into our derivative rule.
 #
+# $$
 # \begin{align}
 # \frac{d}{dx} f(x) &= \frac{f(x+\epsilon)-f(x)}{\epsilon} \\
 #                   &= 2x\cos(x^2)
 # \end{align}
+# $$
 #
 # This is, in my opinion, a rather nice way to derive functions by hand.
 #
