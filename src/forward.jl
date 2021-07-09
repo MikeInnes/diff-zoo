@@ -50,8 +50,8 @@ Expr(dy)
 # dy = 1
 # y1 = log(y0)
 # dy = dy/y0
-# y2 = cos(y1)
-# dy = dy*sin(y1)
+# y2 = sin(y1)
+# dy = dy*cos(y1)
 #   ...
 # ```
 
@@ -186,11 +186,11 @@ D(x -> D(sin, x), 0.5), -sin(0.5)
 # The issue comes about when we close over a variable that *is itself* being
 # differentiated.
 
-D(x -> x*D(y -> x+y, 1), 1) # == 1
+D(x -> x*D(y -> x+y, 1), 1) # == 3
 
-# The derivative $\frac{d}{dy} (x + y) = 1$, so this is equivalent to
-# $\frac{d}{dx}x$, which should also be $1$. So where did this go wrong? The
-# problem is that when we closed over $x$, we didn't just get a numeric value
+# If we simplify the inner closure, this should be equivalent to `D(x -> x*(x+1), 1)`
+# and so its derivative should be `3`. So where did this go wrong?
+# The problem is that when we closed over $x$, we didn't just get a numeric value
 # but a dual number with $\epsilon = 1$. When we then calculated $x + y$, both
 # epsilons were added as if $\frac{dx}{dy} = 1$ (effectively $x = y$). If we had
 # written this down, the answer would be correct.

@@ -73,7 +73,7 @@ function Expr(w::Wengert)
   bs = Dict()
   rename(ex::Expr) = Expr(ex.head, map(x -> get(bs, x, x), ex.args)...)
   rename(x) = x
-  ex = :(;)
+  ex = Expr(:block)
   for v in keys(w)
     if get(cs, v, 0) > 1
       push!(ex.args, :($(Symbol(v)) = $(rename(w[v]))))
@@ -89,6 +89,7 @@ end
 addm(a, b) = a == 0 ? b : b == 0 ? a : :($a + $b)
 mulm(a, b) = 0 in (a, b) ? 0 : a == 1 ? b : b == 1 ? a : :($a * $b)
 mulm(a, b, c...) = mulm(mulm(a, b), c...)
+powm(a, b) = b == 0 ? 1 : b == 1 ? a : :($a ^ $b)
 
 function derive(w::Wengert, x; out = w)
   ds = Dict()
@@ -99,7 +100,8 @@ function derive(w::Wengert, x; out = w)
     Δ = @capture(ex, a_ + b_) ? addm(d(a), d(b)) :
         @capture(ex, a_ * b_) ? addm(mulm(a, d(b)), mulm(b, d(a))) :
         @capture(ex, a_^n_Number) ? mulm(d(a),n,:($a^$(n-1))) :
-        @capture(ex, a_ / b_) ? :($(mulm(b, d(a))) - $(mulm(a, d(b))) / $b^2) :
+        @capture(ex, a_^n_Number) ? mulm(d(a), n, powm(a,n-1)) :
+        @capture(ex, a_ / b_) ? :(($(mulm(b, d(a))) - $(mulm(a, d(b)))) / $(powm(b, 2))) :
         @capture(ex, sin(a_)) ? mulm(:(cos($a)), d(a)) :
         @capture(ex, cos(a_)) ? mulm(:(-sin($a)), d(a)) :
         @capture(ex, exp(a_)) ? mulm(v, d(a)) :
@@ -125,10 +127,10 @@ function derive_r(w::Wengert, x)
       d(a, push!(w, mulm(Δ, b)))
       d(b, push!(w, mulm(Δ, a)))
     elseif @capture(ex, a_^n_Number)
-      d(a, mulm(Δ, n, :($a^$(n-1))))
+      d(a, mulm(Δ, n, :($(powm(a, n-1)))))
     elseif @capture(ex, a_ / b_)
-      d(a, push!(w, mulm(Δ, b)))
-      d(b, push!(w, :(-$(mulm(Δ, a))/$b^2)))
+      d(a, push!(w, :($(mulm(Δ, b)) / $(powm(b, 2)))))
+      d(b, push!(w, :(-$(mulm(Δ, a)) / $(powm(b, 2)))))
     else
       error("$ex is not differentiable")
     end

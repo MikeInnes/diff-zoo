@@ -194,7 +194,7 @@ x = track(t, 5)
 
 y = pow(x, 3)
 y[]
-
+#-
 y.w.instructions |> Expr
 
 # Finally, we need to alter how we derive this list. The key insight is that
@@ -225,7 +225,7 @@ function derive(w::Tape, xs...)
     elseif @capture(ex, a_^n_Number)
       d(a, Δ * n * val(a) ^ (n-1))
     elseif @capture(ex, a_ / b_)
-      d(a, Δ * val(b))
+      d(a, Δ*val(b)/val(b)^2)
       d(b, -Δ*val(a)/val(b)^2)
     else
       error("$ex is not differentiable")
